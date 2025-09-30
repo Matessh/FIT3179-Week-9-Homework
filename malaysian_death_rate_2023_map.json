@@ -1,0 +1,56 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "width": 900,
+  "height": 500,
+  "title": "Death Rate by State in Malaysia (2023)",
+  "projection": {"type": "mercator", "center": [111, 4], "scale": 2100},
+  "layer": [
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/refs/heads/main/malaysian_map_graticules_5_degree.json",
+        "format": {"type": "topojson", "feature": "ne_110m_graticules_5"}
+      },
+      "mark": {"type": "geoshape", "stroke": "darkgray", "strokeWidth": 0.5}
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/refs/heads/main/malaysia-states.topojson",
+        "format": {"type": "topojson", "feature": "states"}
+      },
+      "transform": [
+        {
+          "lookup": "properties.Name",
+          "from": {
+            "data": {
+              "url": "https://raw.githubusercontent.com/Matessh/FIT3179-Week-9-Homework/refs/heads/main/death_state_cleaned.csv"
+            },
+            "key": "state",
+            "fields": ["abs", "rate", "date"]
+          }
+        },
+        {"calculate": "toNumber(substring(datum.date, 6))", "as": "year"},
+        {"filter": "datum.year == 2023"}
+      ],
+      "mark": {"type": "geoshape", "stroke": "white", "strokeWidth": 0.5},
+      "encoding": {
+        "color": {
+          "field": "rate",
+          "type": "quantitative",
+          "scale": {"scheme": "reds"},
+          "legend": {
+            "title": "Deaths per 1,000 population",
+            "orient": "right",
+            "labelFontSize": 11,
+            "titleFontSize": 11
+          }
+        },
+        "tooltip": [
+          {"field": "properties.Name", "title": "State"},
+          {"field": "abs", "title": "Total Deaths"},
+          {"field": "rate", "title": "Death Rate (per 1,000)", "format": ".2f"}
+        ]
+      }
+    }
+  ],
+  "config": {}
+}
